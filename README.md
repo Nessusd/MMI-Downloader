@@ -40,13 +40,6 @@ Build either architecture from PowerShell or Command Prompt:
 The default output directories are `build` and `build-x86`. Both are ignored
 by Git.
 
-## Versioning
-
-The current semantic version is stored in [`VERSION`](VERSION). CMake, Windows
-version resources, and the release packager all read that file as the single
-version source. Release tags use the matching `vMAJOR.MINOR.PATCH` form. Record
-user-visible changes in [`CHANGELOG.md`](CHANGELOG.md) before creating a tag.
-
 ## Creating a release archive
 
 Use one build number for both architectures, build them, and run the packaging
