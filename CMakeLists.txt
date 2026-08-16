@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.24)
 
-project(MMIDownloader VERSION 0.1.0 LANGUAGES C CXX RC)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" MMID_PROJECT_VERSION)
+string(STRIP "${MMID_PROJECT_VERSION}" MMID_PROJECT_VERSION)
+if(NOT MMID_PROJECT_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+    message(FATAL_ERROR "VERSION must contain a semantic version such as 1.2.3")
+endif()
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
+
+project(MMIDownloader VERSION "${MMID_PROJECT_VERSION}" LANGUAGES C CXX RC)
 
 if(DEFINED ENV{MMID_BUILD_NUMBER} AND NOT "$ENV{MMID_BUILD_NUMBER}" STREQUAL "")
     set(MMID_BUILD_NUMBER "$ENV{MMID_BUILD_NUMBER}")
@@ -17,6 +25,19 @@ configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/generated/MMIDownloaderVersion.rc
     @ONLY
 )
+configure_file(
+    src/MMIDownloader.manifest.in
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/MMIDownloader.manifest
+    @ONLY
+)
+# The upstream zlib repository intentionally does not track zconf.h.  Copy the
+# release template into the build tree so a clean checkout does not depend on
+# a locally generated file left in third_party/zlib.
+configure_file(
+    third_party/zlib/zconf.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/zconf.h
+    COPYONLY
+)
 
 add_library(zlib_static STATIC
     third_party/zlib/adler32.c
@@ -26,7 +47,10 @@ add_library(zlib_static STATIC
     third_party/zlib/inftrees.c
     third_party/zlib/zutil.c
 )
-target_include_directories(zlib_static PUBLIC third_party/zlib)
+target_include_directories(zlib_static PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
+    third_party/zlib
+)
 target_compile_definitions(zlib_static PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 add_library(bzip2_static STATIC
@@ -100,7 +124,7 @@ if(MSVC)
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
     target_link_options(MMIDownloader PRIVATE
-        "/MANIFESTINPUT:${CMAKE_CURRENT_SOURCE_DIR}/src/MMIDownloader.manifest")
+        "/MANIFESTINPUT:${CMAKE_CURRENT_BINARY_DIR}/generated/MMIDownloader.manifest")
 
     # Compiler-option probes do not need a linker. Avoid treating transient
     # linker/output-file failures as evidence that a compiler flag is absent.

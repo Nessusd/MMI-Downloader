@@ -1,8 +1,32 @@
 build*/
 out*/
+dist/
 temp/
 tmp/
 *.tmp
+
+# Local developer and agent state
+.agents/
+.codex/
+.vs/
+.vscode/
+.idea/
+CMakeUserPresets.json
+compile_commands.json
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+build.ninja
+.ninja_*
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Local runtime configuration and credentials
 config.ini
 config.*.ini
 !config.example.ini
@@ -23,4 +47,11 @@ WebDAVlog.txt*
 *.pdb
 *.ilk
 *.obj
+*.idb
+*.tlog
+*.res
+*.exp
+*.lib
+*.dll
+*.exe
 *.log

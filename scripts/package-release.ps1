@@ -24,12 +24,14 @@ $OutputDirectory = Resolve-ProjectPath $OutputDirectory
 $X64BuildDirectory = Resolve-ProjectPath $X64BuildDirectory
 $X86BuildDirectory = Resolve-ProjectPath $X86BuildDirectory
 
-$cmake = Get-Content -LiteralPath (Join-Path $root 'CMakeLists.txt') -Raw
-$versionMatch = [regex]::Match($cmake, 'project\(MMIDownloader VERSION ([0-9]+\.[0-9]+\.[0-9]+)')
-if (-not $versionMatch.Success) {
-    throw 'Could not determine the project version from CMakeLists.txt'
+$versionPath = Join-Path $root 'VERSION'
+if (-not (Test-Path -LiteralPath $versionPath -PathType Leaf)) {
+    throw "Missing project version file: $versionPath"
 }
-$version = $versionMatch.Groups[1].Value
+$version = (Get-Content -LiteralPath $versionPath -Raw).Trim()
+if ($version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
+    throw "VERSION must contain a semantic version such as 1.2.3: $versionPath"
+}
 
 function Read-BuildNumber([string]$Header) {
     if (-not (Test-Path -LiteralPath $Header -PathType Leaf)) {
@@ -145,13 +147,14 @@ try {
     New-Item -ItemType Directory -Path (Join-Path $packageRoot 'x64') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $packageRoot 'x86') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $packageRoot 'licenses') -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $packageRoot 'docs') -Force | Out-Null
 
     Copy-Item -LiteralPath $x64 -Destination (Join-Path $packageRoot 'x64\MMIDownloader.exe')
     Copy-Item -LiteralPath $x86 -Destination (Join-Path $packageRoot 'x86\MMIDownloader.exe')
     Copy-Item -LiteralPath (Join-Path $root 'README.md') -Destination (Join-Path $packageRoot 'README.md')
     Copy-Item -LiteralPath (Join-Path $root 'LICENSE') -Destination (Join-Path $packageRoot 'LICENSE')
     Copy-Item -LiteralPath (Join-Path $root 'NOTICE') -Destination (Join-Path $packageRoot 'NOTICE')
-    Copy-Item -LiteralPath (Join-Path $root 'docs\third-party.md') -Destination (Join-Path $packageRoot 'THIRD-PARTY-NOTICES.md')
+    Copy-Item -LiteralPath (Join-Path $root 'docs\third-party.md') -Destination (Join-Path $packageRoot 'docs\third-party.md')
     Copy-Item -LiteralPath (Join-Path $root 'third_party\zlib\LICENSE') -Destination (Join-Path $packageRoot 'licenses\zlib-LICENSE.txt')
     Copy-Item -LiteralPath (Join-Path $root 'third_party\bzlib\LICENSE') -Destination (Join-Path $packageRoot 'licenses\bzip2-LICENSE.txt')
 
