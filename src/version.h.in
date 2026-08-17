@@ -1,0 +1,4 @@
+#pragma once
+
+#define MMID_APP_VERSION "@PROJECT_VERSION@"
+#define MMID_BUILD_NUMBER "@MMID_BUILD_NUMBER@"
