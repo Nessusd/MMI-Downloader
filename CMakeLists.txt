@@ -67,7 +67,11 @@ target_include_directories(bzip2_static PUBLIC third_party/bzlib)
 target_compile_definitions(bzip2_static PRIVATE _CRT_SECURE_NO_WARNINGS BZ_EXPORT BZ_NO_STDIO)
 
 add_library(mmid_core STATIC
+    src/archive.cpp
     src/core.cpp
+    src/package.cpp
+    src/package_preparation.cpp
+    src/removable_drive.cpp
 )
 target_include_directories(mmid_core
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -89,6 +93,8 @@ target_link_libraries(mmid_core PRIVATE
 
 add_executable(MMIDownloader WIN32
     src/gui.cpp
+    src/settings_dialog.cpp
+    src/ui_helpers.cpp
     src/MMIDownloader.rc
     ${CMAKE_CURRENT_BINARY_DIR}/generated/MMIDownloaderVersion.rc
 )

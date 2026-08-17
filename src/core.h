@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <exception>
 #include <filesystem>
 #include <functional>
 #include <limits>
@@ -169,6 +170,7 @@ bool is_cancelled_message(const std::string& message);
 std::string format_win32_error(DWORD error);
 std::wstring utf8_to_wide(const std::string& input);
 std::string wide_to_utf8(const std::wstring& input);
+std::wstring exception_message(const std::exception& exception);
 std::wstring trim_w(std::wstring value);
 std::wstring trim_slashes(std::wstring value);
 bool iequals_w(std::wstring_view left, std::wstring_view right);

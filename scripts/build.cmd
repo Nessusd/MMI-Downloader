@@ -56,8 +56,8 @@ if /I "%MMID_CMAKE_GENERATOR%"=="Ninja" (
 cmake -S . -B "%BUILD_DIR%" -G "%MMID_CMAKE_GENERATOR%" -DCMAKE_BUILD_TYPE=Release
 if errorlevel 1 exit /b %errorlevel%
 
-rem The two first-party translation units are intentionally compiled
-rem sequentially to keep peak memory usage predictable on service laptops.
+rem First-party translation units are intentionally compiled sequentially to
+rem keep peak memory usage predictable on service laptops.
 if /I "%MMID_CMAKE_GENERATOR%"=="NMake Makefiles" (
     cmake --build "%BUILD_DIR%" --config Release
 ) else (
